@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THANK YOU | Morohashi Takumi Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .thanks_wrapper {
+            max-width: 100%;
+            height: 100vh;
+            background-color: #106655; /* ナビ展開画面と同じ深い緑黒 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #ffffff;
+            padding: 0 4%;
+        }
+        .thanks_title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(56, 239, 125, 0.4);
+        }
+        .thanks_text {
+            font-size: 16px;
+            line-height: 2;
+            margin-bottom: 40px;
+            font-weight: 700;
+        }
+        .btn_back {
+            display: inline-block;
+            padding: 18px 40px;
+            border: 1px solid #ffffff;
+            color: #ffffff;
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            transition: all 0.4s ease;
+            border-radius: 4px;
+        }
+        .btn_back:hover {
+            background-color: #38ef7d;
+            color: #050e0c;
+            box-shadow: 0 0 20px rgba(56, 239, 125, 0.6);
+        }
+    </style>
+</head>
+<body style="margin: 0;">
+    <main class="thanks_wrapper">
+        <h1 class="thanks_title">THANK YOU</h1>
+        <p class="thanks_text">
+            お問い合わせを受け付けました。<br>
+            内容を確認の上、追ってご連絡いたしますので今しばらくお待ちください。
+        </p>
+        <a href="index.html" class="btn_back">BACK TO HOME</a>
+    </main>
+</body>
+</html>

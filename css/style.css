@@ -1,0 +1,1784 @@
+/* --- Base Colors & Utility --- */
+.bg_gray {
+    background-color: #f9f9f9;
+}
+
+.section_header {
+    margin-bottom: 60px;
+}
+
+/* ナビゲーションの基本設定 */
+header .logo,
+nav ul li a {
+    transition: color 0.4s ease;
+    /* 滑らかに色を変える */
+}
+
+/* 白背景セクション用の黒文字クラス */
+header.is-light .logo,
+header.is-light nav ul li a {
+    color: var(--main-color);
+    /* または #1a1a1a */
+}
+
+/* 通常時のロゴとナビリンク */
+header .logo,
+nav ul li a {
+    transition: color 0.4s ease;
+}
+
+
+/* --- 【今回の核心】About以降に差し掛かった時の「緑の帯」状態 --- */
+header.is-light {
+    z-index: 1000;
+    padding: 18px 4%; /* スクロール時に少しヘッダーの縦幅を縮めてスマートに */
+    background-color: rgba(5, 75, 61, 0.877); /* 空間拡張に合わせた深い緑の半透明の帯 */
+    backdrop-filter: blur(12px); /* 背後の要素が高級感たっぷりにボケるガラスエフェクト */
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* 下側にうっすらと落とす影 */
+    border-bottom: 1px solid rgba(56, 239, 125, 0.15); /* 帯の下境界に細いネオン線を走らせる */
+}
+
+/* 緑の帯ができた時の文字色（可視性を担保するために白〜ネオンへ変更） */
+header.is-light .logo {
+    color: white;
+}
+
+header.is-light nav ul li a {
+    color: rgba(255, 255, 255, 0.8); /* ナビリンクは上品な白ベースに */
+}
+
+/* 緑の帯がある状態でのホバー演出 */
+header.is-light nav ul li a:hover {
+    color: #38ef7d; /* ホバーするとネオンに発光 */
+    text-shadow: 0 0 8px #38ef7d;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    display: inline-block;
+    position: relative;
+}
+
+/* ホバー時に一瞬だけ左右に震えるアニメーションを適用 */
+nav ul li a:hover {
+    color: #38ef7d; /* ネオングリーン */
+    animation: text-glitch 0.3s linear;
+}
+
+@keyframes text-glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 1px); text-shadow: 1px 0 #ff4a7d; }
+    40% { transform: translate(2px, -1px); text-shadow: -1px 0 #38ef7d; }
+    60% { transform: translate(-1px, -1px); }
+    80% { transform: translate(1px, 1px); }
+    100% { transform: translate(0); }
+}
+
+/* ==========================================================================
+   【新規追加】ハンバーガーメニュー用ベース設定 (PC時はボタンを隠す)
+   ========================================================================== */
+.hamburger_btn {
+    display: none;
+}
+
+/* ==========================================================================
+   【新規追加】スマートフォン・タブレット用レイアウト (768px以下)
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* 1. ハンバーガーボタンの出現設定 */
+    .hamburger_btn {
+        display: block;
+        position: relative;
+        width: 30px;
+        height: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        z-index: 102; /* メニュー背景より手前に配置 */
+        outline: none;
+        padding: 0;
+    }
+
+    /* 三本線の共通スタイル */
+    .hamburger_btn .bar {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: #ffffff; /* 通常時は白線 */
+        transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                    background-color 0.4s ease, 
+                    top 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                    opacity 0.4s ease;
+    }
+    
+    .bar_top { top: 0; }
+    .bar_mid { top: 11px; }
+    .bar_bottom { top: 22px; }
+
+    /* スクロールして「緑の帯」がある時はボタンの線をネオンカラーに変更 */
+    header.is-light .hamburger_btn .bar {
+        background-color: #ffffff;
+        box-shadow: 0 0 5px #ffffff;
+    }
+
+    /* メニュー展開時（Open）の三本線のクロスアニメーション */
+    header.menu-open .bar_top {
+        top: 11px;
+        transform: rotate(45deg);
+    }
+    header.menu-open .bar_mid {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+    header.menu-open .bar_bottom {
+        top: 11px;
+        transform: rotate(-45deg);
+    }
+
+    /* 2. フルスクリーンメニュー画面の設定 */
+    header .global_nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: var(--main-color);
+        z-index: 101; /* ロゴやボタンのすぐ裏側 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        /* 初期状態は上方に完全に隠しておく */
+        transform: translateY(-100%);
+        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        
+        /* PC用スライドエフェクトをSP画面内では無効化するためのリセット */
+        line-height: normal;
+        height: 100vh;
+    }
+
+    /* メニューが開いた状態のスタイル */
+    header.menu-open .global_nav {
+        transform: translateY(0);
+    }
+
+    /* SPメニュー内のナビゲーション縦並び */
+    header .global_nav ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 40px;
+    }
+
+    /* メニュー内リンク：下からパラパラと湧き上がる設定 */
+    header .global_nav ul li a {
+        font-size: 24px; /* タップしやすい巨大サイズ */
+        letter-spacing: 0.2em;
+        text-indent: 0.2em;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: transform 0.4s ease, opacity 0.4s ease, color 0.3s ease;
+        color: #ffffff; /* 通常時は白文字 */
+    }
+
+    /* メニュー展開後に時間差（Delay）をつけて順次フェードイン */
+    header.menu-open .global_nav ul li a {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    header.menu-open .global_nav ul li:nth-child(1) a { transition-delay: 0.2s; }
+    header.menu-open .global_nav ul li:nth-child(2) a { transition-delay: 0.3s; }
+    header.menu-open .global_open .global_nav ul li:nth-child(3) a { transition-delay: 0.4s; }
+    header.menu-open .global_nav ul li:nth-child(4) a { transition-delay: 0.5s; }
+    header.menu-open .global_nav ul li:nth-child(5) a { transition-delay: 0.6s; }
+
+    /* SPメニュー内でのホバー（タップ時）はグリッチをオフにして発光のみに最適化 */
+    header .global_nav ul li a:hover {
+        animation: none;
+        color: #38ef7d;
+        text-shadow: 0 0 10px #38ef7d;
+    }
+}
+
+
+
+/* --- Layout --- */
+.inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 4%;
+}
+
+/*メインビジュアル*/
+/* --- メインタイトル：リキッド・ディストーション仕様 --- */
+
+.hero_title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(3.5rem, 10vw, 8rem);
+    font-weight: 900;
+    line-height: 0.9;
+    text-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+    color: var(--bg-color);
+    text-align: center;
+    position: relative;
+    z-index: 10;
+
+    /* ↓【核心】上で作ったSVGフィルターを文字に適用 */
+    filter: url(#liquid-text-filter);
+
+    /* 動きを滑らかにするための設定 */
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+/* --- マウスを乗せた（ホバー）時のエフェクト --- */
+.hero_title:hover {
+    /* マウスが乗ると、わずかに拡大しつつ、後ろの液体に引っ張られるようにさらに歪みます */
+    transform: scale(1.03);
+    filter: url(#liquid-text-filter) drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+    cursor: pointer;
+}
+
+/* --- アイデア3：ハイブリッド・スクロールマーキーのスタイル --- */
+.marquee_container {
+    position: relative;
+    width: 100vw;
+    overflow: hidden;
+    /* 画面外の文字を隠す */
+    z-index: 10;
+    padding: 20px 0;
+}
+
+.marquee_wrapper {
+    display: flex;
+    white-space: nowrap;
+    width: max-content;
+    will-change: transform;
+}
+
+/* 1つの文字の塊のスタイル */
+.marquee_text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(4rem, 12vw, 10rem);
+    /* 圧倒的に巨大なサイズ感 */
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #ffffff;
+    padding: 0 40px;
+    /* 文字同士の間隔 */
+    letter-spacing: 0.02em;
+}
+
+/* 交互に並べる「輪郭線だけ（アウトライン）」の文字 */
+.marquee_text.outline {
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.4);
+    /* 白い輪郭線だけにする */
+}
+
+/* 肩書きのスタイルの位置調整 */
+.hero_sub {
+    font-family: 'Montserrat', sans-serif;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 40px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    z-index: 15;
+    position: relative;
+}
+
+/* --- ローディング画面全体のスタイル --- */
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #106655;
+    /* メインカラーの緑 */
+    z-index: 99999;
+    /* 何よりも最前面に配置 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    overflow: hidden;
+    clip-path: circle(100% at 50% 50%);
+    /* スクロールバーの干渉を防ぐ */
+    pointer-events: all;
+}
+
+.loader_content {
+    text-align: center;
+}
+
+/* カウントアップ数字 */
+.loader_num {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 1;
+    display: block;
+    color: rgba(255, 255, 255, 0.2);
+    margin-bottom: 10px;
+}
+
+/* ローディングタイトル */
+.loader_title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4em;
+    text-indent: 0.4em;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.section_num {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--main-color);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+}
+
+.section_num_works {
+    color: white;
+}
+
+.section_title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+}
+
+.section_title_works {
+    color: white;
+}
+
+/* --- スクロールインジケーター全体の配置 --- */
+.scroll_indicator {
+    position: absolute;
+    bottom: 40px;
+    /* 画面下部からの距離 */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+    /* テキストと同層 */
+    pointer-events: none;
+    /* スクロールやクリックの邪魔をしない */
+}
+
+/* SCROLLの文字スタイル */
+.scroll_text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    /* 少し透過させて上品に */
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+    /* 中央揃えを維持するためのインデント */
+}
+
+/* 線の土台（マスク） */
+.scroll_line {
+    position: relative;
+    width: 1px;
+    height: 60px;
+    /* 線の長さ */
+    background: rgba(255, 255, 255, 0.15);
+    /* 待機状態の薄い線 */
+    overflow: hidden;
+    filter: blur(1px);
+}
+
+/* 動く白線（アニメーションの本体） */
+.scroll_line::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    /* くっきりした白線 */
+    animation: scroll-move 2.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+/* 線が上から下へ受け流されるアニメーション */
+@keyframes scroll-move {
+    0% {
+        top: -100%;
+    }
+
+    50% {
+        top: 0;
+    }
+
+    100% {
+        top: 100%;
+    }
+}
+
+
+
+/* ==========================================================================
+   ABOUTセクション：重なり順・デザイン完全統合版
+   ========================================================================== */
+#about {
+    position: relative;
+    z-index: 2;
+    background-color: #ffffff;
+    /* 必要に応じてお好みの背景色に調整してください */
+    width: 100%;
+    height: 100vh;
+    /* 画面高さいっぱいに固定 */
+    overflow: hidden;
+    box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* 最背面に浮かぶ巨大な背景文字 */
+.about_bg_text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 25vw;
+    font-weight: 900;
+    color: rgba(0, 0, 0, 0.015);
+    user-select: none;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 通常のセクションインナーコンテナ */
+#about .inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+    /* インナー全体の透明な枠がクリックを吸い込むのを完全に防ぐ */
+}
+
+/* タイトルヘッダー部分だけはホバー等の操作を復活させる */
+#about .section_header {
+    pointer-events: auto;
+}
+
+/* --- ABOUT：中央の静かなステートメントエリア --- */
+.about_statement_wrap {
+    position: absolute;
+    top: 53%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 680px;
+    text-align: center;
+    z-index: 2;
+    /* 物理演算ステージ（zIndex:3）の「裏側」に回り込ませる */
+    pointer-events: none;
+    /* テキストの隙間をマウス操作が100%すり抜けるようにする */
+    opacity: 0;
+    transform: translate(-50%, -42%);
+}
+
+.about_statement_inner h3 {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 900;
+    color: #0d473c;
+    margin-bottom: 24px;
+    letter-spacing: -0.01em;
+}
+
+.about_statement_inner p {
+    font-size: clamp(0.9rem, 1.1vw, 1rem);
+    color: #444444;
+    line-height: 1.9;
+    margin-bottom: 12px;
+    text-align: justify;
+}
+
+/* --- ABOUT：雪のように言葉が降り積もる物理ステージ --- */
+#about-physics-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    /* 中央メッセージ（zIndex:2）よりも手前に配置 */
+    pointer-events: auto;
+    /* ここでMatter.jsへのすべてのマウス・タップ入力を受け付ける */
+}
+
+/* 降ってくるテキストブロック（リンク要素） */
+.about-snow-word {
+    position: absolute;
+    display: inline-block;
+    padding: 14px 28px;
+    background: rgba(255, 255, 255, 0.95);
+    /* 高級感を持たせる高輝度の白 */
+    border: 2px solid var(--main-color, #106655);
+    color: var(--main-color, #106655);
+    font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+    font-weight: 700;
+    border-radius: 30px;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transform-origin: center center;
+    will-change: transform;
+    transition: background 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+    z-index: 5;
+    pointer-events: auto;
+    /* 文字ブロック単体でもしっかりと入力を確保 */
+}
+
+/* ホバーした時のインタラクション */
+.about-snow-word:hover {
+    background: var(--main-color, #106655);
+    color: #ffffff;
+    box-shadow: 0 8px 25px rgba(16, 102, 85, 0.3);
+    z-index: 999 !important;
+    /* ホバーしたブロックを最前面に */
+}
+
+/* ==========================================================================
+   ABOUT：詳細ポップアップ（モーダルウィンドウ）
+   ========================================================================== */
+.about_modal_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(13, 71, 60, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    z-index: -1;
+    /* 通常時は遥か最背面に隠す */
+    display: none;
+    /* 完全に存在自体を消滅させ、不要な透明の防壁を消す */
+    align-items: center;
+    justify-content: center;
+
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* アクティブ時：一瞬で最前面へ浮上 */
+.about_modal_overlay.is-active {
+    display: flex !important;
+    z-index: 9999 !important;
+    opacity: 1;
+}
+
+/* ポップアップウィンドウ本体 */
+.about_modal_window {
+    background: #ffffff;
+    width: 92%;
+    max-width: 540px;
+    padding: 48px 40px;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(13, 71, 60, 0.15);
+    position: relative;
+    transform: scale(0.95) translateY(15px);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    pointer-events: none;
+    /* 閉じている時は入力を無効化 */
+}
+
+/* アクティブ時はウィンドウ内のクリックを許可 */
+.about_modal_overlay.is-active .about_modal_window {
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+}
+
+/* 閉じるボタン */
+.about_modal_close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #0d473c;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.about_modal_close:hover {
+    opacity: 1;
+}
+
+/* モーダル内テキスト */
+.modal_tag_label {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #1a8a74;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+}
+
+#modal-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0d473c;
+    margin-bottom: 18px;
+}
+
+.modal_content_text {
+    font-size: 0.95rem;
+    color: #444444;
+    line-height: 1.8;
+}
+
+/* VIEW MOREボタン（必要に応じて） */
+.about_btn_overlay {
+    position: absolute;
+    bottom: 40px;
+    right: 4%;
+    z-index: 10;
+}
+
+/*ボタンゾーン*/
+
+.btn_arrow {
+    position: relative;
+    display: inline-block;
+    padding: 20px 0;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 700;
+    z-index: 1;
+    margin: 20px 0;
+}
+
+/* テキストの後ろにある円 */
+.btn_arrow::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -20px;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background: rgba(16, 102, 85, 0.1);
+    /* メインカラーの薄い色 */
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+    z-index: -1;
+}
+
+.btn_arrow:hover::before {
+    width: 150px;
+    /* 円が横に伸びてボタンを包む */
+    border-radius: 30px;
+    background: var(--main-color);
+}
+
+.btn_arrow:hover {
+    color: #fff;
+    padding-left: 10px;
+    /* 少し右にずらす */
+}
+
+
+/* ==========================================================================
+   WORKSセクション
+   ========================================================================== */
+
+#works {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    overflow: hidden;
+
+    /* 【劇的変更】真っ黒な闇の中に、発光するサイバーグリーンと深いエメラルドが混ざり合うハイコントラスト配色 */
+    background: linear-gradient(135deg,
+            #000000 0%,
+            /* 完全な漆黒（デバイスが消えないベースの闇） */
+            #106655 30%,
+            /* 深いブランドグリーン */
+            #01887d 55%,
+            /* 【核】圧倒的に明るい発光ネオングリーン（これが動くことで光の波がはっきり見えます） */
+            #06231d 75%,
+            /* 陰影を作るディープグリーン */
+            #000000 100%
+            /* 完全な漆黒で引き締め */
+        );
+
+    /* 背景サイズをさらに巨大化（600%）して、色の移動距離をダイナミックに広げる */
+    background-size: 600% 600%;
+
+    /* 速度を20秒から「12秒」に少し早め、うごめいている質感をしっかりと体感させます */
+    animation: auroraLiquid 12s ease-in-out infinite;
+}
+
+.works_shutter_shading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.shutter_half {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 50.5%;
+    background: #000000;
+    will-change: transform;
+}
+
+.shutter_top {
+    top: 0;
+}
+
+.shutter_bottom {
+    bottom: 0;
+}
+
+.shutter_line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #38ef7d;
+    transform: translateY(-50%) scaleX(0);
+    transform-origin: center center;
+    box-shadow: 0 0 20px #38ef7d;
+    will-change: transform, opacity;
+}
+
+/* ==========================================================================
+   WORKS：背景透過モックアップを最高に活かす高級リデザイン
+   ========================================================================== */
+
+/* ==========================================================================
+   WORKS：背景透過モックアップを最高に活かす【オーロラ・リキッド】統合CSS
+   ========================================================================== */
+
+/* 1. コンテンツステージ：3色の深緑が液体のようになめらかにうごめく背景 */
+.works_content_inner {
+    position: relative;
+    max-width: 100%;
+    z-index: 1;
+    padding: 6% 5%;
+    opacity: 0;
+
+}
+
+/* 背景を滑らかに移動させるキーフレーム */
+@keyframes auroraLiquid {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* 3カラム対応の美しいグリッドレイアウト */
+.works_grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 50px 30px;
+    margin-top: 60px;
+}
+
+@media (max-width: 992px) {
+    .works_grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .works_grid {
+        grid-template-columns: 1fr;
+        gap: 40px 0;
+    }
+}
+
+/* 実績カード単体 */
+.work_item {
+    display: block;
+    color: inherit;
+    position: relative;
+    opacity: 0;
+    transform: translateY(40px);
+    text-decoration: none !important;
+}
+
+/* 3Dチルトのカプセル化空間（背景透過を120%活かす） */
+.work_img_box.js-tilt-box {
+    width: 100%;
+    position: relative;
+    aspect-ratio: 16 / 11;
+    overflow: visible;
+    /* ハミ出しを許可し、ドロップシャドウを綺麗に見せる */
+    background: transparent !important;
+    /* 真っ黒な四角い枠の背景を完全撤廃 */
+    border-radius: 0;
+
+    transform-style: preserve-3d;
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+    transform-origin: center center;
+    will-change: transform;
+
+    /* モックアップの輪郭に沿って、空間に浮いているような淡い光の影を落とす */
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 1px rgba(56, 239, 125, 0.2));
+    transition: filter 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ホバー時に、浮遊感と発光感を少し強める */
+.work_item:hover .work_img_box.js-tilt-box {
+    filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 15px rgba(56, 239, 125, 0.3));
+}
+
+.work_img_box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* 四角く切り取らず、モックアップの形を綺麗に維持 */
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* マスク挙動のリファイン（ベタ塗りの四角を廃止し、近未来的な光のベールに） */
+.work_mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(16, 102, 85, 0.6) 0%, transparent 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+/* ホバー時の文字の浮き上がりを洗練 */
+.mask_text {
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    background: rgba(7, 36, 30, 0.5);
+    /* 文字の背景だけを薄くぼかす */
+    backdrop-filter: blur(4px);
+    padding: 12px 24px;
+    border-radius: 4px;
+    transform: scale(0.9);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.work_item:hover .mask_text {
+    transform: scale(1);
+}
+
+/* 慣性マグネットのテキスト土台 */
+.work_meta.js-magnet-meta {
+    margin-top: 0;
+    padding-top: 20px;
+    display: block;
+    position: relative;
+    z-index: 10;
+    will-change: transform;
+}
+
+.work_tag {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #38ef7d;
+    /* ネオングリーン */
+    letter-spacing: 0.08em;
+}
+
+.work_name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 5px;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+
+    /* 念のためのプロテクト：ここでも下線を強制的に消す */
+    text-decoration: none !important;
+}
+
+.work_meta.js-magnet-meta.work_btn_capsule {
+    margin-top: 25px;
+    padding: 16px 20px;
+    /* 左右の余白を少しだけスマートに調整 */
+    display: block;
+    position: relative;
+    z-index: 10;
+    will-change: transform;
+    text-decoration: none !important;
+    cursor: pointer;
+
+    /* 【バグ解消のキモ】親の幅を100%として認識させ、パディングを内側に含める */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    /* paddingが外側にはみ出すのを絶対防御 */
+}
+
+/* ボタン内のテキストエリア（位置中央揃え） */
+.capsule_inner {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+    text-align: center;
+    /* スマホ画面でテキストが美しく真ん中に来るように配置 */
+}
+
+/* ぷるんと歪む、有機的なリキッド背景の本体 */
+.capsule_liquid_bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    box-sizing: border-box;
+    /* 背景のボーダーも内側に含める */
+
+    border-radius: 50px;
+    background: rgba(16, 102, 85, 0.2);
+    border: 1px solid rgba(56, 239, 125, 0.4);
+
+    transition: border-radius 0.6s cubic-bezier(0.25, 1, 0.5, 1),
+        background 0.4s ease,
+        border-color 0.4s ease,
+        transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    will-change: border-radius, transform;
+}
+
+/* PC用ホバー演出 */
+.work_item:hover .capsule_liquid_bg {
+    background: rgba(56, 239, 125, 0.15);
+    border-color: #38ef7d;
+    box-shadow: 0 0 15px rgba(56, 239, 125, 0.3);
+    border-radius: 45px 55px 48px 52px / 52px 48px 55px 45px;
+}
+
+/* テキストのスタイル調整 */
+.work_tag {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #38ef7d;
+    letter-spacing: 0.1em;
+    margin: 0;
+}
+
+.work_name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 4px;
+    margin-bottom: 0;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    text-decoration: none !important;
+}
+
+/* --- Skills Section --- */
+#skills {
+    position: relative;
+    z-index: 999;
+    /* WORKS よりもさらに手前に重ねる */
+    background-color: var(--gray-color);
+    width: 100%;
+    background-color: var(--gray-color);
+    /* ABOUTと同じ薄グレーの背景 */
+}
+
+/* --- Skills Inspector Mode Style --- */
+#skills {
+    background-color: #0d111a;
+    /* ベースは深いダークネイビー */
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* モードがCODEに切り替わったときのサイバーな背景色 */
+#skills.code-active {
+    background-color: #050e0c;
+    /* より深いエディタ風の黒緑 */
+}
+
+/* モード切り替えボタン（文字だけの剥き出しポップデザイン） */
+.mode-switcher-wrap {
+    text-align: center;
+    margin-bottom: 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    z-index: 10;
+    position: relative;
+}
+
+.mode-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+.mode-splitter {
+    color: rgba(255, 255, 255, 0.1);
+    margin: 0 15px;
+}
+
+/* アクティブな方のモードをポップに発光させる */
+.mode-btn.active[data-mode="design"] {
+    color: #ff4a7d;
+    /* デザインは鮮やかなポップピンク */
+    text-shadow: 0 0 15px rgba(255, 74, 125, 0.6);
+}
+
+.mode-btn.active[data-mode="code"] {
+    color: #38ef7d;
+    /* コードは例のクロマキーネオングリーン */
+    text-shadow: 0 0 15px rgba(56, 239, 125, 0.6);
+}
+
+/* メインステージの自由配置レイアウト */
+.inspector-core {
+    position: relative;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* イラストを包む枠のない空間 */
+.inspector-illustration-wrap {
+    position: relative;
+    width: 420px;
+    z-index: 5;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* ボヨンと弾む */
+}
+
+.illustration-display {
+    width: 100%;
+    border-radius: 24px;
+    padding: 10px;
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* モードごとにイラストの背景（オーラ）を切り替える */
+.illustration-display.design-bg {
+    background: radial-gradient(circle, rgba(255, 74, 125, 0.15) 0%, transparent 70%);
+}
+
+.illustration-display.code-bg {
+    background: radial-gradient(circle, rgba(56, 239, 125, 0.2) 0%, transparent 70%);
+}
+
+.main-illust {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 16px;
+
+    /* 2枚を完全に同じ位置に重ねる */
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: calc(100% - 20px);
+    /* パディング分の微調整 */
+
+    /* 初期状態は両方非表示、クラスがついた方だけを可視化 */
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95);
+    transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.4s ease;
+}
+
+/* アクティブな画像だけを手前にボヨンと出現させる */
+.main-illust.active {
+    position: relative;
+    /* 1枚をrelativeにすることで親要素の高さ崩れを防ぐ */
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    z-index: 2;
+}
+
+/* スキルテキストのグループ（絶対配置でイラストの周りに散りばめる） */
+.skill-info-group {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.skill-info-group.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* 枠のない、剥き出しのテキストコンポーネント */
+.giant-skill-text {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    will-change: transform, opacity;
+}
+
+.skill-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.4rem, 2.2vw, 2rem);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+}
+
+/* モードごとの文字色 */
+#group-design .skill-title {
+    color: #ff4a7d;
+}
+
+#group-code .skill-title {
+    color: #38ef7d;
+}
+
+.skill-detail {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    font-weight: 700;
+}
+
+/* --- 規則性を完全に排除したアシンメトリー配置 --- */
+/* DESIGNモードの位置 */
+#group-design .giant-skill-text:nth-child(1) {
+    top: 10%;
+    left: -2%;
+    text-align: left;
+}
+
+#group-design .giant-skill-text:nth-child(2) {
+    bottom: 15%;
+    right: -2%;
+    text-align: right;
+}
+
+/* CODEモードの位置（要素数を増やして配置をずらす） */
+#group-code .giant-skill-text:nth-child(1) {
+    top: 5%;
+    right: 2%;
+    text-align: right;
+}
+
+#group-code .giant-skill-text:nth-child(2) {
+    middle: 50%;
+    left: -5%;
+    text-align: left;
+}
+
+#group-code .giant-skill-text:nth-child(3) {
+    bottom: -5%;
+    right: 1%;
+    text-align: left;
+}
+
+/* レスポンシブ：スマホでは重なりを防ぐためにすっきりとした縦並びへ昇華 */
+@media (max-width: 992px) {
+    .inspector-core {
+        flex-direction: column;
+        min-height: auto;
+        height: auto;
+    }
+
+    .inspector-illustration-wrap {
+        width: 80%;
+        margin-bottom: 40px;
+    }
+
+    .skill-info-group {
+        position: relative;
+        height: auto;
+        display: none;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .skill-info-group.active {
+        display: flex;
+    }
+
+    .giant-skill-text {
+        position: relative;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: 100%;
+        text-align: center !important;
+    }
+}
+
+/* --- Skills Mode Switcher Redesign --- */
+.mode-switcher-wrap {
+    text-align: center;
+    margin-bottom: 60px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 16px;
+    position: relative;
+    z-index: 100;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    padding: 6px;
+    border-radius: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* ポップで押し心地のあるネオンボタン */
+.mode-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    padding: 12px 32px;
+    border-radius: 40px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    outline: none;
+}
+
+.mode-btn:not(.active):hover {
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.mode-splitter {
+    display: none;
+    /* カプセルデザインに統合するため斜線は廃止 */
+}
+
+/* 【DESIGN MODE】アクティブ時の鮮やかなピンク発光 */
+.mode-btn.active[data-mode="design"] {
+    color: #ffffff;
+    background: #ff4a7d;
+    box-shadow: 0 0 20px rgba(255, 74, 125, 0.6),
+        inset 0 2px 2px rgba(255, 255, 255, 0.3);
+}
+
+/* 【CODE MODE】アクティブ時のサイバーグリーン発光 */
+.mode-btn.active[data-mode="code"] {
+    color: #ffffff;
+    background: #38ef7d;
+    box-shadow: 0 0 20px rgba(56, 239, 125, 0.6),
+        inset 0 2px 2px rgba(255, 255, 255, 0.3);
+}
+
+
+/* --- Contact --- */
+/* --- Contact --- */
+#contact {
+    position: relative;
+    z-index: 10; /* 他の暗いセクションと重なりを統一 */
+    background-color: var(--main-color); /* 深い緑 */
+    color: #ffffff;
+}
+
+.contact_wrap {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.contact_intro {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.contact_intro p {
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    font-weight: 700;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.contact_form_new .input_row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.input_group {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.input_group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 0.1em;
+    color: #38ef7d; /* ラベルをネオングリーンにしてサイバー感を強調 */
+}
+
+.input_group input,
+.input_group textarea {
+    width: 100%;
+    padding: 16px 0;
+    background: transparent;
+    border: none; /* 元の標準borderを完全に撤廃 */
+    font-family: inherit;
+    font-size: 16px;
+    color: #ffffff;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+}
+
+/* 待機状態の薄い白線（土台となる元の線） */
+.input_group::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px; /* 線の太さ */
+    background: rgba(255, 255, 255, 0.2); /* 元の薄い線 */
+    z-index: 1;
+}
+
+/* プレースホルダーの色 */
+.input_group input::placeholder,
+.input_group textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.input_group textarea {
+    height: 120px;
+    resize: none;
+}
+
+/* 上からなぞる蛍光グリーンのネオン線 */
+.input_border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px; /* 土台と全く同じ太さ */
+    background: #38ef7d;
+    transform: scaleX(0);
+    transform-origin: left center; /* 左から右へなぞるように伸びる */
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 0 10px #38ef7d;
+    z-index: 3; /* 土台の白線（z-index:1）の真上に重ねる */
+}
+
+/* フォーカス時にネオン線が土台を完全に覆う */
+.input_group input:focus ~ .input_border,
+.input_group textarea:focus ~ .input_border {
+    transform: scaleX(1);
+}
+
+.input_group input:focus,
+.input_group textarea:focus {
+    outline: none;
+}
+
+/* 送信ボタン：ホバーでネオン発光する液体的デザイン */
+.submit_btn_wrap {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.btn_submit {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 320px;
+    padding: 20px;
+    background: transparent;
+    border: 1px solid #38ef7d;
+    color: #38ef7d;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    overflow: hidden;
+    transition: color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    border-radius: 4px;
+}
+
+.btn_text {
+    position: relative;
+    z-index: 2;
+}
+
+/* ボタン背景の液体侵食エフェクト */
+.btn_bg {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: #38ef7d;
+    z-index: 1;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    transform: skewX(-15deg); /* 斜めに滑り込ませる */
+}
+
+.btn_submit:hover {
+    color: #0d473c; /* ボタンの文字を反転 */
+    box-shadow: 0 0 25px rgba(56, 239, 125, 0.6);
+}
+
+.btn_submit:hover .btn_bg {
+    transform: translateX(100%) skewX(-15deg);
+}
+
+.display_sp {
+    display: none;
+}
+
+/* --- Footer --- */
+footer {
+    background-color: #050e0c; /* SKILLSのCODEモードと合わせた、漆黒に近い深緑で引き締め */
+    color: #ffffff;
+    padding: 60px 0 30px;
+    border-top: 1px solid rgba(56, 239, 125, 0.1); /* 境界線にうっすらネオンの余韻 */
+    position: relative;
+    z-index: 10;
+}
+
+.footer_inner {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.footer_main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.footer_brand {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.footer_logo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: 0.05em;
+    color: #38ef7d; /* フッターロゴをネオングリーンにしてブランドを印象付ける */
+}
+
+.footer_sub {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.15em;
+}
+
+/* フッターメニューの横並び */
+.footer_nav ul {
+    display: flex;
+    list-style: none;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.footer_nav ul li a {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    transition: color 0.3s ease;
+}
+
+/* メニューのホバーでネオン発光 */
+.footer_nav ul li a:hover {
+    color: #38ef7d;
+}
+
+/* 最下部のコピーライトエリア */
+.footer_bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.footer_bottom .copyright {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.footer_links a {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer_links a:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .footer_main {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .footer_nav ul {
+        justify-content: center;
+        gap: 16px 24px;
+    }
+    
+    .footer_bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* --- Page Top Button --- */
+.pagetop_btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 56px;
+    height: 56px;
+    background-color: rgba(7, 36, 30, 0.9); /* ヘッダーの帯と合わせた深い緑黒 */
+    border: 1px solid rgba(56, 239, 125, 0.3); /* 薄いネオン線の境界 */
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 9999; /* 何よりも最前面に配置 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    
+    /* 初期状態は透明＆少し下に下げて隠しておく */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    
+    /* 出現・消失時のなめらかなアニメーション設定 */
+    transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* ボタンがアクティブ（画面内に出現）になった時のクラス */
+.pagetop_btn.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* 中央のミニマルな上向き矢印 */
+.pagetop_arrow {
+    position: relative;
+    z-index: 2;
+    width: 12px;
+    height: 12px;
+    border-top: 2px solid #38ef7d; /* 蛍光グリーン */
+    border-left: 2px solid #38ef7d;
+    transform: rotate(45deg) translate(2px, 2px); /* 斜めを上向きに変形 */
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+/* 背景に仕込む有機的なリキッド・オーラ */
+.pagetop_bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #38ef7d;
+    border-radius: 50%;
+    z-index: 1;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+}
+
+/* --- ホバー時の極上インタラクション --- */
+.pagetop_btn:hover {
+    border-color: #38ef7d;
+    box-shadow: 0 0 20px rgba(56, 239, 125, 0.6); /* ネオン発光 */
+}
+
+.pagetop_btn:hover .pagetop_arrow {
+    border-color: #050e0c; /* 矢印の色を暗い緑黒に反転 */
+    transform: rotate(45deg) translate(2px, 2px) scale(1.1);
+}
+
+.pagetop_btn:hover .pagetop_bg {
+    opacity: 1;
+    transform: scale(1); /* 緑の丸が内側からフワッと満たされる */
+}
+
+/* スマホ対応：少しだけ位置を詰めて押しやすく */
+@media (max-width: 768px) {
+    .pagetop_btn {
+        bottom: 20px;
+        right: 20px;
+        width: 48px;
+        height: 48px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .works_grid,
+    .contact_form_new .input_row {
+        grid-template-columns: 1fr;
+    }
+
+    .about_flex {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .about_deco {
+        font-size: 8rem;
+        top: -50px;
+    }
+
+    .display_sp {
+        display: block;
+    }
+
+    .works_grid {
+        grid-template-columns: 1fr;
+        /* 縦1列にする */
+        gap: 40px 0;
+
+        /* 【バグ解消】縦一列になったカード（.work_item）たちを、画面の中央に揃える */
+        justify-items: center;
+    }
+
+    .work_item {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .work_img_box img {
+        width: 80%;
+        height: 100%;
+        object-fit: contain;
+        /* 四角く切り取らず、モックアップの形を綺麗に維持 */
+        transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .work_meta.js-magnet-meta.work_btn_capsule {
+        margin-top: 25px;
+        padding: 16px 20px;
+        /* 左右の余白を少しだけスマートに調整 */
+        display: block;
+        position: relative;
+        z-index: 10;
+        will-change: transform;
+        text-decoration: none !important;
+        cursor: pointer;
+        width: 80%;
+        max-width: 100%;
+        box-sizing: border-box;
+        /* paddingが外側にはみ出すのを絶対防御 */
+    }
+
+}
+
+@media (max-width: 390px) {
+    .about_statement_wrap {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 680px;
+        text-align: center;
+        z-index: 2;
+        /* 物理演算ステージ（zIndex:3）の「裏側」に回り込ませる */
+        pointer-events: none;
+        /* テキストの隙間をマウス操作が100%すり抜けるようにする */
+        opacity: 0;
+        transform: translate(-50%, -42%);
+    }
+}

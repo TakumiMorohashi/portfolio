@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morohashi Takumi Portfolio</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/about-physics.js"></script>
+    <script src="js/works-interaction.js"></script>
+    <script src="js/skill-interaction.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        :root {
+            --main-color: #106655;
+            /* メインカラーを継承 */
+            --bg-color: #ffffff;
+            --text-color: #1a1a1a;
+            --gray-color: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .section_padding {
+            padding: 120px 0;
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 30px 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 24px;
+            color: var(--bg-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--bg-color);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            position: -webkit-sticky;
+            /* Safari用 */
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+            z-index: 1;
+            display: flex;
+            overflow: hidden;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: var(--main-color);
+        }
+
+
+        #liquid-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-color: var(--main-color);
+            /* 背景は完全に黒にする */
+            /* ↓重要：ここでボヤけた円を液体に変えます */
+        }
+
+        /* もし画面端を暗くしたい場合（画像の雰囲気を維持） */
+        .hero_vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 20%, rgba(0, 0, 0, 0.8) 100%);
+            z-index: 1;
+            /* キャンバスより上に重ねる */
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+
+            /* 薄い粒子（ノイズ）をキャンバスや文字より「上」に重ねる */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            background-size: 150px;
+
+            /* mix-blend-mode: overlay を使うことで、
+       下の緑色とノイズが綺麗に混ざり合います。
+       opacityで粒子の濃さを調整できます（0.05〜0.1あたりが上品でおすすめ）。
+    */
+            mix-blend-mode: overlay;
+            opacity: 1;
+
+            /* ヴィネット（影）や文字よりも上に重ねるために大きめの数字にする */
+            z-index: 5;
+            pointer-events: none;
+            /* マウス操作を透過させる */
+        }
+
+        /* --- 4. フィルターと調整用のクラス（一つに統合） --- */
+        .hero.dark-theme {
+            /* セクション全体にコントラストをかけることで、
+       文字の白が引き締まり、全体のトーンがシネマティックになります
+        */
+            filter: contrast(1.1) brightness(0.95) grayscale(0.1);
+        }
+
+        /* もし画面端を暗くしたい場合（ヴィネットの重なり順をキャンバスより上、ノイズより下に） */
+        .hero_vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 20%, rgba(0, 0, 0, 0.8) 100%);
+            z-index: 2;
+            /* z-indexを1から2に上げてキャンバスより上に */
+            pointer-events: none;
+        }
+
+        /* 背景の巨大な文字 */
+        .p_text {
+            position: absolute;
+            bottom: 5%;
+            left: -5%;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 25vw;
+            font-weight: 900;
+            color: rgba(16, 102, 85, 0.03);
+            /* 非常に薄く */
+            line-height: 1;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .hero_content {
+            position: relative;
+            z-index: 10;
+            color: #ffffff;
+        }
+
+        .parallax_bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .hero_title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(3.5rem, 10vw, 8rem);
+            font-weight: 900;
+            line-height: 0.9;
+            text-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+            color: var(--bg-color);
+            /* 視認性を高める */
+            z-index: 3;
+        }
+
+        .hero_title span {
+            display: inline-block;
+            /* アニメーションのために必須 */
+        }
+
+        .hero_sub {
+            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Montserrat', sans-serif;
+            margin-top: 20px;
+            letter-spacing: 0.3em;
+            z-index: 3;
+        }
+
+
+        /* --- About Section --- */
+        .section_label {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            color: var(--main-color);
+            margin-bottom: 20px;
+        }
+
+        .about_content h3 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 30px;
+        }
+
+        .about_content h3 span {
+            color: var(--main-color);
+        }
+
+        /* --- Works Section --- */
+        .works_grid {
+            display: grid;
+
+            gap: 60px 40px;
+            margin-top: 50px;
+        }
+
+        .work_card {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .work_img {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            background: var(--gray-color);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .work_img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .work_card:hover .work_img img {
+            transform: scale(1.1);
+        }
+
+        .work_info {
+            padding-top: 20px;
+        }
+
+        .work_category {
+            font-size: 12px;
+            color: var(--main-color);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+
+        .work_title {
+            font-size: 20px;
+            margin-top: 5px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 60px 0;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+
+        /* --- Animation Classes --- */
+        .fade_up {
+            opacity: 0;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- 1. SVGテクスチャフィルタ（ABOUTセクション用） -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="mesh-texture">
+            <feTurbulence type="fractalNoise" baseFrequency="0.01 0.1" numOctaves="2" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="30" />
+        </filter>
+    </svg>
+
+    <!-- 2. オープニング・ローディング画面 -->
+    <div id="loader">
+        <div class="loader_content">
+            <span class="loader_num">00</span>
+            <div class="loader_title">Now Loading...</div>
+        </div>
+    </div>
+
+    <!-- 3. 固定ヘッダー -->
+    <header>
+        <div class="logo">MT.</div>
+
+        <!-- ハンバーガーボタン（SP用） -->
+        <button type="button" class="hamburger_btn" id="js-hamburger" aria-label="メニューを開閉する">
+            <span class="bar bar_top"></span>
+            <span class="bar bar_mid"></span>
+            <span class="bar bar_bottom"></span>
+        </button>
+
+        <nav class="global_nav" id="js-nav">
+            <ul>
+                <li><a href="#home">HOME</a></li>
+                <li><a href="#about">ABOUT</a></li>
+                <li><a href="#works">WORKS</a></li>
+                <li><a href="#contact">CONTACT</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- 4. メインコンテンツ -->
+    <main>
+        <!-- ヒーローセクション（アイデア3：スクロールマーキー仕様） -->
+        <section id="home" class="hero dark-theme">
+            <canvas id="liquid-canvas"></canvas>
+            <div class="hero_vignette"></div>
+
+            <!-- 無限ループする極大文字のコンテナ（合計3つ以上同じものを並べて隙間を消します） -->
+            <div class="marquee_container" id="marquee-trigger">
+                <div class="marquee_wrapper">
+                    <div class="marquee_text">MOROHASHI TAKUMI</div>
+                    <div class="marquee_text outline">MOROHASHI TAKUMI</div>
+                    <div class="marquee_text">MOROHASHI TAKUMI</div>
+                    <div class="marquee_text outline">MOROHASHI TAKUMI</div>
+                </div>
+            </div>
+
+            <!-- 肩書きを誠実なしっくりくる言葉に変更 -->
+            <p class="hero_sub" id="sub">Web Designer / Coder</p>
+
+            <div class="scroll_indicator">
+                <span class="scroll_text">SCROLL</span>
+                <div class="scroll_line"></div>
+            </div>
+        </section>
+
+        <!-- ABOUTセクション -->
+        <section id="about" class="section_padding bg_gray">
+
+
+            <div class="inner">
+                <div class="section_header fade_up">
+                    <h2 class="section_title">ABOUT</h2>
+                </div>
+
+                <div id="about-physics-stage"></div>
+
+                <div class="about_statement_wrap">
+                    <div class="about_statement_inner">
+                        <h3>触れる楽しさを、<br class="display_sp">１行に込めて。</h3>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div id="about-modal" class="about_modal_overlay">
+            <div class="about_modal_window">
+                <button type="button" class="about_modal_close" aria-label="閉じる">×</button>
+                <div class="about_modal_body">
+                    <span class="modal_tag_label">ABOUT ME</span>
+                    <h4 id="modal-title">見出し</h4>
+                    <div id="modal-text" class="modal_content_text">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WORKSセクション -->
+        <section id="works" class="section_padding">
+            <div class="works_shutter_shading">
+                <div class="shutter_half shutter_top"></div>
+                <div class="shutter_half shutter_bottom"></div>
+                <div class="shutter_line"></div>
+            </div>
+
+            <div class="inner works_content_inner">
+
+                <div class="section_header">
+                    <h2 class="section_title section_title_works">WORKS</h2>
+                </div>
+
+
+                <div class="works_grid">
+                    <a href="https://www.morohashi-warabe.com/socialtech/" class="work_item">
+                        <div class="work_img_box js-tilt-box">
+                            <img src="img/socialtech_works.png" alt="SocialTech">
+                            <div class="work_mask">
+                                <span class="mask_text">EXPLORE</span>
+                            </div>
+                        </div>
+                        <div class="work_meta js-magnet-meta work_btn_capsule">
+                            <div class="capsule_inner">
+                                <p class="work_tag">FRONT-END / CORPORATE</p>
+                                <h4 class="work_name">SocialTech</h4>
+                            </div>
+                            <div class="capsule_liquid_bg"></div>
+                        </div>
+                    </a>
+
+                    <a href="https://www.morohashi-warabe.com/hairsalon/" target="_blank" class="work_item">
+                        <div class="work_img_box js-tilt-box">
+                            <img src="img/hairtech_works.png" alt="HairTech">
+                            <div class="work_mask">
+                                <span class="mask_text">EXPLORE</span>
+                            </div>
+                        </div>
+                        <div class="work_meta js-magnet-meta work_btn_capsule">
+                            <div class="capsule_inner">
+                                <p class="work_tag">FRONT-END / MINIMAL SALON</p>
+                                <h4 class="work_name">Hair Salon: HairTech</h4>
+                            </div>
+                            <div class="capsule_liquid_bg"></div>
+                        </div>
+                    </a>
+
+                    <a href="https://www.morohashi-warabe.com/cozyinn/" target="_blank" class="work_item">
+                        <div class="work_img_box js-tilt-box">
+                            <img src="img/hotel_works.png" alt="HairTech">
+                            <div class="work_mask">
+                                <span class="mask_text">EXPLORE</span>
+                            </div>
+                        </div>
+                        <div class="work_meta js-magnet-meta work_btn_capsule">
+                            <div class="capsule_inner">
+                                <p class="work_tag">CONCEPTUAL / ONSEN RESORT</p>
+                                <h4 class="work_name">Hotel: Cozy Inn</h4>
+                            </div>
+                            <div class="capsule_liquid_bg"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+     03. SKILLSセクション（裏画面切り替え：インスペクターモード）
+     ========================================================================== -->
+        <section id="skills" class="section_padding">
+            <div class="inner inspector-stage">
+
+                <!-- モードを切り替える、剥き出しのトグルシステム -->
+                <div class="mode-switcher-wrap">
+                    <button type="button" class="mode-btn js-mode-btn active" data-mode="design">DESIGN MODE</button>
+                    <span class="mode-splitter">/</span>
+                    <button type="button" class="mode-btn js-mode-btn" data-mode="code">CODE MODE</button>
+                </div>
+
+                <!-- 中央のメインエリア（イラストとスキルの融合） -->
+                <div class="inspector-core">
+
+                    <!-- イラスト表示エリア（2枚の画像を重ねてJSで切り替え） -->
+                    <div class="inspector-illustration-wrap">
+                        <div class="illustration-display design-bg">
+                            <!-- DESIGN用のイラスト（初期状態で表示） -->
+                            <img src="img/morohashi_design.png" alt="Designing Takumi"
+                                class="main-illust js-illust-design active">
+                            <!-- CODE用のイラスト（最初は透明にして重ねておく） -->
+                            <img src="img/morohashi_code.png" alt="Coding Takumi" class="main-illust js-illust-code">
+                        </div>
+                    </div>
+
+                    <!-- 【DESIGNモード時】に飛び出す超巨大スキル＆説明テキスト -->
+                    <!-- ※初回登場アニメーションの対象となります -->
+                    <div class="skill-info-group js-skill-group active" id="group-design">
+                        <div class="giant-skill-text">
+                            <span class="skill-title">UI/UX DESIGN</span>
+                            <span class="skill-detail">ユーザーが迷わない動線と、感情が動くビジュアルの両立。</span>
+                        </div>
+                        <div class="giant-skill-text">
+                            <span class="skill-title">FIGMA COMPONENT</span>
+                            <span class="skill-detail">コンポーネント化を徹底した、エンジニアに愛されるカチッとした設計。</span>
+                        </div>
+                    </div>
+
+                    <!-- 【CODEモード時】に飛び出す超巨大スキル＆説明テキスト -->
+                    <div class="skill-info-group js-skill-group" id="group-code">
+                        <div class="giant-skill-text">
+                            <span class="skill-title">PHP</span>
+                            <span class="skill-detail">お問い合わせフォームのメール送信や、裏側のデータ処理など、Webサイトが『正しく機能する』ためのロジックを構築。</span>
+                        </div>
+                        <div class="giant-skill-text">
+                            <span class="skill-title">HTML5 / CSS3</span>
+                            <span class="skill-detail">ただ映るだけじゃない、ウラ側まで美しい妥協のないマークアップ。</span>
+                        </div>
+                        <div class="giant-skill-text">
+                            <span class="skill-title">WORDPRESS</span>
+                            <span class="skill-detail">クライアント自身で簡単に更新できる、丁寧なバックエンド設計。</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACTセクション -->
+        <!-- CONTACTセクション -->
+        <section id="contact" class="section_padding">
+            <div class="inner">
+                <div class="section_header fade_up">
+                    <h2 class="section_title">CONTACT</h2>
+                </div>
+                <div class="contact_wrap fade_up">
+                    <div class="contact_intro">
+                        <p>プロジェクトのご相談、お見積りなど<br>お気軽にお問い合わせください。</p>
+                    </div>
+                    <!-- 【重要】登録後に発行されるSSForm等のURLを action="..." に貼り付け、method="POST" を設定してください -->
+                    <form class="contact_form_new" action="https://ssgform.com/s/9LtukTwQHcB1" method="POST">
+                        <div class="input_row">
+                            <div class="input_group">
+                                <label for="form-name">お名前</label>
+                                <input type="text" id="form-name" name="name" placeholder="例：山田 太郎" required>
+                                <span class="input_border"></span>
+                            </div>
+                            <div class="input_group">
+                                <label for="form-email">メールアドレス</label>
+                                <input type="email" id="form-email" name="email" placeholder="example@mail.com"
+                                    required>
+                                <span class="input_border"></span>
+                            </div>
+                        </div>
+                        <div class="input_group">
+                            <label for="form-message">お問い合わせ内容</label>
+                            <textarea id="form-message" name="message" placeholder="ご自由に入力してください" required></textarea>
+                            <span class="input_border"></span>
+                        </div>
+                        <div class="submit_btn_wrap">
+                            <button type="submit" class="btn_submit">
+                                <span class="btn_text">SEND MESSAGE</span>
+                                <span class="btn_bg"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==========================================================================
+         FOOTERセクション
+         ========================================================================== -->
+    <footer>
+        <div class="inner footer_inner">
+            <div class="footer_main">
+                <!-- ロゴ・肩書き -->
+                <div class="footer_brand">
+                    <div class="footer_logo">MT.</div>
+                    <p class="footer_sub">Web Designer / Coder</p>
+                </div>
+
+                <!-- フッターナビゲーション -->
+                <nav class="footer_nav">
+                    <ul>
+                        <li><a href="#">HOME</a></li>
+                        <li><a href="#about">ABOUT</a></li>
+                        <li><a href="#works">WORKS</a></li>
+                        <li><a href="#skills">SKILLS</a></li>
+                        <li><a href="#contact">CONTACT</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- コピーライトとプロの証明用サブリンク -->
+            <div class="footer_bottom">
+                <p class="copyright">&copy; 2026 Morohashi Takumi. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- ==========================================================================
+         PAGE TOP（トップへ戻る）ボタン
+         ========================================================================== -->
+    <button type="button" id="js-pagetop" class="pagetop_btn" aria-label="トップへ戻る">
+        <!-- 上向きのシンプルな矢印（CSSで綺麗に形を作ります） -->
+        <span class="pagetop_arrow"></span>
+        <span class="pagetop_bg"></span>
+    </button>
+
+    <!-- 5. 完全に一本化した最新JavaScript（GSAPマーキー制御） -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const tl = gsap.timeline();
+
+            // Loadingテキスト出現
+            tl.to('.loader_title', { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" });
+
+            // カウントアップ
+            tl.to('.loader_num', {
+                innerText: 100, duration: 1.5, snap: "innerText", ease: "power1.out",
+                onUpdate: function () {
+                    const num = Math.floor(this.targets()[0].innerText);
+                    this.targets()[0].innerText = num < 10 ? '0' + num : num;
+                }
+            }, "-=0.3");
+
+            // サークル状にくり抜きアウト
+            tl.to('#loader', { clipPath: 'circle(0% at 50% 50%)', duration: 1.2, ease: "power4.inOut" });
+            tl.to('#loader', { display: 'none', duration: 0 });
+
+            // マーキー全体のフェードイン・湧き上がり
+            if (document.querySelector('.marquee_container')) {
+                tl.from('.marquee_container', { y: 40, opacity: 0, duration: 1.2, ease: "power3.out" }, "-=0.5");
+            }
+
+            // 肩書き（サブタイトル）の出現
+            if (document.getElementById('sub')) {
+                tl.from('#sub', { opacity: 0, y: 20, duration: 1 }, "-=0.8");
+            }
+
+            // --- スクロール速度連動マーキーのロジック ---
+            const wrapper = document.querySelector('.marquee_wrapper');
+            let scrollSpeed = 1;
+            let currentX = 0;
+
+            // 毎フレーム動かす常時ループ処理
+            function animateMarquee() {
+                // 通常時はスピード1で左へ、スクロール時はscrollSpeedが加算されて加速する
+                currentX -= scrollSpeed;
+
+                // テキスト要素1個分（全体の25%）左に流れたらループの継ぎ目を無くすために0に戻す
+                if (currentX <= -wrapper.offsetWidth / 2) {
+                    currentX = 0;
+                }
+
+                gsap.set(wrapper, { x: currentX });
+
+                // スクロールによる加速を徐々に元の速度（1）へ減速させていく（慣性）
+                scrollSpeed += (1 - scrollSpeed) * 0.08;
+
+                requestAnimationFrame(animateMarquee);
+            }
+
+            if (wrapper) {
+                animateMarquee();
+            }
+
+            // スクロールイベントを検知してスピードをギュンと上げる
+            window.addEventListener('scroll', () => {
+                // スクロールされた瞬間に、勢いに応じてスピードをプラス（最大値などを適宜調整可能）
+                scrollSpeed += 1.5;
+            });
+
+
+            // スクロール連動のフェードイン（ABOUTやWORKS用）
+            if (typeof ScrollTrigger !== 'undefined') {
+                gsap.registerPlugin(ScrollTrigger);
+                gsap.utils.toArray('.fade_up').forEach(el => {
+                    gsap.to(el, {
+                        y: 0, opacity: 1, duration: 1.2, ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: el, start: "top 85%", toggleActions: "play none none reverse"
+                        }
+                    });
+                });
+            }
+        });
+
+        // ヘッダーの色切り替え
+        if (typeof ScrollTrigger !== 'undefined') {
+            ScrollTrigger.create({
+                trigger: "#about", start: "top 60px",
+                onEnter: () => document.querySelector('header').classList.add('is-light'),
+                onLeaveBack: () => document.querySelector('header').classList.remove('is-light')
+            });
+
+            // ==========================================================================
+            // 「トップへ戻る」ボタンのスクロール出現＆クリック制御
+            // ==========================================================================
+            const pageTopBtn = document.getElementById('js-pagetop');
+            const homeSection = document.getElementById('home');
+
+            if (pageTopBtn && homeSection && typeof ScrollTrigger !== 'undefined') {
+                // ScrollTriggerを使って、HOMEセクション（メインビジュアル）を過ぎたらボタンを検知して出す
+                ScrollTrigger.create({
+                    trigger: homeSection,
+                    start: "bottom top", // HOMEの最下部が、画面の一番上に到達したら発火
+                    onEnter: () => pageTopBtn.classList.add('is-active'),
+                    onLeaveBack: () => pageTopBtn.classList.remove('is-active')
+                });
+
+                // ボタンがクリックされた時のスムーススクロール処理（jQueryの既存アニメーションと連携）
+                pageTopBtn.addEventListener('click', () => {
+                    $('html, body').animate({
+                        scrollTop: 0
+                    }, 600, 'swing');
+                });
+            }
+        }
+
+        // ==========================================================================
+        // スマートフォン用ハンバーガーメニュー開閉制御（追加分）
+        // ==========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const headerEl = document.querySelector('header');
+            const hamburgerBtn = document.getElementById('js-hamburger');
+            const navLinks = document.querySelectorAll('#js-nav a');
+
+            // 要素がしっかり存在しているか確認して実行
+            if (hamburgerBtn && headerEl) {
+                // 1. ボタンをクリックしたときに menu-open クラスを着脱する
+                hamburgerBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // イベントのバブリング（誤作動）を防止
+                    headerEl.classList.toggle('menu-open');
+                });
+
+                // 2. メニューの中のリンク（HOMEやABOUTなど）を押したら自動でメニューを閉じる
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        headerEl.classList.remove('menu-open');
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
