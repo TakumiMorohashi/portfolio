@@ -785,7 +785,7 @@ nav ul li a:hover {
 /* 1. コンテンツステージ：3色の深緑が液体のようになめらかにうごめく背景 */
 .works_content_inner {
     position: relative;
-    max-width: 100%;
+    max-width: 80%;
     z-index: 1;
     padding: 6% 5%;
     opacity: 0;
